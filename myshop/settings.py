@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shop',
     'crispy_forms',
+    'shop.context_processors.cart',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
