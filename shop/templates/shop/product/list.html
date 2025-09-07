@@ -1,10 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Каталог товаров{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Сайдбар с категориями -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Категории</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item {% if not category %}active{% endif %}">
+                        <a href="{% url 'shop:product_list' %}" class="text-decoration-none">Все товары</a>
+                    </li>
+                    {% for cat in categories %}
+                    <li class="list-group-item {% if category.slug == cat.slug %}active{% endif %}">
+                        <a href="{% url 'shop:product_list_by_category' cat.slug %}" class="text-decoration-none">
+                            {{ cat.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список товаров -->
+    <div class="col-md-9">
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                        <p class="h5 text-primary">{{ product.price }} руб.</p>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <a href="{% url 'shop:product_detail' product.id product.slug %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Подробнее
+                        </a>
+                        <form action="{% url 'shop:cart_add' product.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-success btn-sm ms-1">
+                                <i class="fas fa-cart-plus"></i> В корзину
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Товары в этой категории отсутствуют.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
